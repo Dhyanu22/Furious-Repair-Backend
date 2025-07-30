@@ -41,8 +41,8 @@ app.use(
         "mongodb+srv://dhyanu:Goodboy%402216@cluster0.dwmer2w.mongodb.net/Furious-Repair?retryWrites=true&w=majority&appName=Cluster0",
     }),
     cookie: {
-      secure: false, // true if HTTPS
-      httpOnly: true,
+      secure: true,
+      sameSite: 'none',
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
   })
