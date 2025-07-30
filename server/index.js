@@ -20,20 +20,37 @@ mongoose
   .then(() => console.log("MongoDB Connected"))
   .catch((err) => console.error("Mongo Error:", err));
 
-// Middlewares
-app.use(express.json());
-app.use(cookieParser());
+// Trust proxy for secure cookies on Render
+app.set("trust proxy", 1);
+
+// Allowed origins
+const allowedOrigins = [
+  "https://furious-repair-frontend-w9nd.vercel.app",
+  "http://localhost:5173", // For local development
+];
+
+// CORS Configuration
 app.use(
   cors({
-    origin: "https://furious-repair-frontend-w9nd.vercel.app", // frontend URL
+    origin: function (origin, callback) {
+      if (!origin || allowedOrigins.includes(origin)) {
+        callback(null, true);
+      } else {
+        callback(new Error("Not allowed by CORS"));
+      }
+    },
     credentials: true,
   })
 );
 
-// Session configuration with MongoDB store
+// Middlewares
+app.use(express.json());
+app.use(cookieParser());
+
+// Session configuration
 app.use(
   session({
-    secret: process.env.SESSION_SECRET || "repair_secret", // use env var in production
+    secret: process.env.SESSION_SECRET || "repair_secret",
     resave: false,
     saveUninitialized: false,
     store: MongoStore.create({
@@ -41,8 +58,9 @@ app.use(
         "mongodb+srv://dhyanu:Goodboy%402216@cluster0.dwmer2w.mongodb.net/Furious-Repair?retryWrites=true&w=majority&appName=Cluster0",
     }),
     cookie: {
-      secure: true,
-      sameSite: 'none',
+      secure: true,           // must be true for cross-site cookies
+      sameSite: "none",       // allow cross-origin cookies
+      httpOnly: true,         // protect against XSS
       maxAge: 1000 * 60 * 60 * 24, // 1 day
     },
   })
@@ -53,16 +71,17 @@ app.use("/api/auth", authRoutes);
 app.use("/api/users", basicRoutes);
 app.use("/api/repairer", repairerRoutes);
 
-// Health check route
+// Health check
 app.get("/", (req, res) => {
   res.json({ message: "Furious Repair API is running!" });
 });
 
-// Error handling middleware
+// Error handling
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({ message: "Something went wrong!" });
 });
 
+// Server start
 const PORT = process.env.PORT || 3001;
 app.listen(PORT, () => console.log(`Server running on port ${PORT}`));
