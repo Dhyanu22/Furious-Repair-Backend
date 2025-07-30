@@ -25,7 +25,7 @@ app.use(express.json());
 app.use(cookieParser());
 app.use(
   cors({
-    origin: "https://furious-repair-frontend-w9nd.vercel.app/", // frontend URL
+    origin: "https://furious-repair-frontend-w9nd.vercel.app", // frontend URL
     credentials: true,
   })
 );
