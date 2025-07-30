@@ -5,7 +5,7 @@
   "description": "Backend for Furious Repair authentication system",
   "main": "index.js",
   "scripts": {
-    "start": "nodemon index.js"
+    "start": "node index.js"
   },
   "dependencies": {
     "express": "^4.18.2",
